@@ -1,19 +1,21 @@
 import { getProducts, deleteProduct } from '../../services/productService';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 
 const ProductsPage = () => {
+    console.log("funciono");
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
         codigo: '',
         nombre: ''
     });
-    const navigate = useNavigate();
+   // const navigate = useNavigate();
    const fetchProducts = async () => {
         try {
             setLoading(true);
             const response = await getProducts();
+            console.log(response);
             setProducts(response.data);
         } catch (error) {
             console.error('Error fetching products:', error);
