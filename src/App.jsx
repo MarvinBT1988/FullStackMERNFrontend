@@ -5,7 +5,6 @@ function App() {
 
   return (
     <>
-    <h1>Funciono</h1>
      <ProductsPage/>
     </>
   )

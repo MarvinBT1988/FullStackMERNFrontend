@@ -14,7 +14,7 @@ const ProductsPage = () => {
    const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await getProducts();
+            const response = await getProducts(formData);
             console.log(response);
             setProducts(response.data);
         } catch (error) {
@@ -66,8 +66,6 @@ const ProductsPage = () => {
               <button onClick={() => navigate('/products/create')}>Agregar Producto</button><br />
             </form>
             <h1>Lista de Productos</h1>
-           
-           
             <table>
                 <thead>
                     <tr>
