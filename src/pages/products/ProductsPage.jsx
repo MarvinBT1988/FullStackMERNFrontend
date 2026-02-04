@@ -10,7 +10,7 @@ const ProductsPage = () => {
         codigo: '',
         nombre: ''
     });
-   // const navigate = useNavigate();
+    //const navigate = useNavigate();
    const fetchProducts = async () => {
         try {
             setLoading(true);
@@ -62,7 +62,7 @@ const ProductsPage = () => {
                         required
                     />
                 </div>
-               <button onClick={fetchProducts}>Refrescar</button>
+               <button onClick={fetchProducts}>Buscar</button>
               <button onClick={() => navigate('/products/create')}>Agregar Producto</button><br />
             </form>
             <h1>Lista de Productos</h1>
