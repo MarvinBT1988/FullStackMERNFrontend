@@ -10,10 +10,10 @@ const ProductsPage = () => {
         nombre: ''
     });
     const navigate = useNavigate();
-    const fetchProducts = async () => {
+   const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await getProducts(formData);
+            const response = await getProducts();
             setProducts(response.data);
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -33,7 +33,7 @@ const ProductsPage = () => {
         }
     };
 
-    useEffect(() => {
+   useEffect(() => {
         fetchProducts();
     }, []);
 
@@ -42,7 +42,7 @@ const ProductsPage = () => {
     }
     return (
         <div>
-            <form>
+           <form>
                 <div>
                     <label>Código:</label>
                     <input 
