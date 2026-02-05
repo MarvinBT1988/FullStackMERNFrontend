@@ -1,6 +1,6 @@
 import { getProducts, deleteProduct } from '../../services/productService';
 import { useEffect, useState } from 'react';
-//import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ProductsPage = () => {
     console.log("funciono");
@@ -10,7 +10,7 @@ const ProductsPage = () => {
         codigo: '',
         nombre: ''
     });
-    //const navigate = useNavigate();
+    const navigate = useNavigate();
    const fetchProducts = async () => {
         try {
             setLoading(true);
