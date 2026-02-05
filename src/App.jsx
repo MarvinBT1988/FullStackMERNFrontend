@@ -2,6 +2,9 @@
 import ProductsPage from './pages/products/ProductsPage'
 import CreateProductPage from './pages/products/CreateProductPage'
 import EditProductPage from './pages/products/EditProductPage'
+import CustomersPage from './pages/customers/CustomersPage'
+import CreateCustomerPage from './pages/customers/CreateCustomerPage'
+import EditCustomerPage from './pages/customers/EditCustomerPage'
 import './App.css'
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import Layout from './components/Layout';
@@ -16,7 +19,10 @@ function App() {
             <Route index element={<Home />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/create" element={<CreateProductPage />} />
-            <Route path="/products/edit/:id" element={<EditProductPage />} />           
+            <Route path="/products/edit/:id" element={<EditProductPage />} />   
+             <Route path="/customers" element={<CustomersPage />} />  
+             <Route path="/customers/create" element={<CreateCustomerPage />} />    
+              <Route path="/customers/edit/:id" element={<EditCustomerPage />} />    
           </Route>
         </Routes>
       </BrowserRouter>

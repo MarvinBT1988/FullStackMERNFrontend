@@ -1,9 +1,10 @@
-import { createProduct } from '../../services/productService';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { productZodSchema } from '../../schemas/product';
+import { getCustomerById, updateCustomer } from '../../services/customerService';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { customerZodSchema } from '../../schemas/customer';
 import ErrorMessage from '../../components/ErrorMessage';
-const CreateProductPage = () => {
+const EditCustomerPage = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const [errors, setErrors] = useState([]);
     const [formData, setFormData] = useState({
@@ -12,11 +13,23 @@ const CreateProductPage = () => {
         codigo: '',
         marca: ''
     });
+
+    const fetchCustomer = async () => {
+        try {
+            const response = await getCustomerById(id);
+            setFormData(response.data);
+        } catch (error) {
+            console.error('Error fetching customer:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCustomer();
+    }, [id]);
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const resultado = productZodSchema.safeParse(formData);
-
+            const resultado = customerZodSchema.safeParse(formData);
             if (!resultado.success) {
 
                 const listaErrores = resultado.error.issues.map(issue => ({
@@ -24,9 +37,10 @@ const CreateProductPage = () => {
                     mensaje: issue.message
                 }));
                 setErrors(listaErrores);
-            } else {
-                await createProduct(formData);
-                navigate('/products');
+            }
+            else {
+                await updateCustomer(id, formData);
+                navigate('/customers');
             }
 
         } catch (error) {
@@ -43,17 +57,16 @@ const CreateProductPage = () => {
              setErrors([{ campo: 'SERVER', mensaje: serverMessage }]);
         }
     }
-    { errors.name && <p className="text-red-500">{errors.name[0]}</p> }
     return (
         <div>
-            <h1>Crear Nuevo Producto</h1>
+            <h1>Editar Cliente</h1>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Código:</label>
+               <div>
+                    <label>DUI:</label>
                     <input
                         type="text"
-                        value={formData.codigo}
-                        onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
+                        value={formData.DUI}
+                        onChange={(e) => setFormData({ ...formData, DUI: e.target.value })}
                         required
                     />
                 </div>
@@ -67,27 +80,26 @@ const CreateProductPage = () => {
                     />
                 </div>
                 <div>
-                    <label>Descripcion:</label>
-                    <input
-                        type="text"
-                        value={formData.descripcion}
-                        onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-                    />
+                    <label>Direccion:</label>
+                    <textarea type="text"
+                        value={formData.direccion}
+                        onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}>
+                    </textarea>
                 </div>
 
                 <div>
-                    <label>Marca:</label>
+                    <label>Telefono:</label>
                     <input
                         type="text"
-                        value={formData.marca}
-                        onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
+                        value={formData.telefono}
+                        onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
                     />
                 </div>
-                <button type="submit">Crear Producto</button>
-                <button type="button" onClick={() => navigate('/products')}>Cancelar</button>
+                <button type="submit">Actualizar Cliente</button>
+                <button type="button" onClick={() => navigate('/customers')}>Cancelar</button>
             </form>
-          <ErrorMessage errors={errors}/>  
+              <ErrorMessage errors={errors}/>  
         </div>
     );
 }
-export default CreateProductPage;
+export default EditCustomerPage;

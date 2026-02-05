@@ -1,0 +1,41 @@
+const { z } = require('zod');
+
+const userZodSchema = z.object({
+  nombre: z
+    .string({ required_error: 'El nombre es obligatorio' })
+    .min(1, 'El nombre no puede estar vacío'),
+
+  apellido: z
+    .string({ required_error: 'El apellido es obligatorio' })
+    .min(1, 'El apellido no puede estar vacío'),
+
+  email: z
+    .string({ required_error: 'El email es obligatorio' })
+    .email('El formato del email no es válido'),
+
+  telefono: z
+    .string()
+    .optional(),
+
+  password: z
+    .string({ required_error: 'La contraseña es obligatoria' })
+    .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+
+  rol: z
+    .enum(['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'], {
+      errorMap: (issue, ctx) => ({
+        message: `${ctx.data} no es un rol válido`,
+      }),
+    })
+    .default('SALES_ROLE'),
+
+  status: z
+    .enum(['active', 'inactive'], {
+      errorMap: (issue, ctx) => ({
+        message: `${ctx.data} no es un estado válido`,
+      }),
+    })
+    .default('active'),
+});
+
+module.exports = { userZodSchema };

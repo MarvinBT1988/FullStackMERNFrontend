@@ -44,7 +44,17 @@ const EditProductPage = () => {
             }
 
         } catch (error) {
-            console.error('Error updating product:', error);
+            let serverMessage="";
+            if (error.response) {
+                 serverMessage = error.response.data.error || 'Error en el servidor';               
+            } else if (error.request) {
+                serverMessage ='No se pudo conectar con el servidor';
+                console.error(serverMessage);
+            } else {
+                serverMessage =error.message;
+                console.error(serverMessage);
+            }
+             setErrors([{ campo: 'SERVER', mensaje: serverMessage }]);
         }
     }
     return (
