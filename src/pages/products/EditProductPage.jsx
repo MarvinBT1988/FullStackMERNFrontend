@@ -2,6 +2,7 @@ import { getProductById, updateProduct } from '../../services/productService';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productZodSchema } from '../../schemas/product';
+import ErrorMessage from '../../components/ErrorMessage';
 const EditProductPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -87,18 +88,7 @@ const EditProductPage = () => {
                 <button type="submit">Actualizar Producto</button>
                 <button type="button" onClick={() => navigate('/products')}>Cancelar</button>
             </form>
-             {errors.length > 0 && (
-                <div className="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
-                    <h3 className="text-red-700 font-bold">Errores de validación:</h3>
-                    <ul className="list-disc ml-5">
-                        {errors.map((error, index) => (
-                            <li key={index} className="text-red-600">
-                                <strong>{error.campo}:</strong> {error.mensaje}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+              <ErrorMessage errors={errors}/>  
         </div>
     );
 }
