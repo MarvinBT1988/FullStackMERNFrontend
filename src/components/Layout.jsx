@@ -7,7 +7,8 @@ const Layout = () => {
         <nav className="flex gap-4 container mx-auto">
              <Link to="/" className="hover:underline">Home</Link>|
              <Link to="/products" className="hover:underline">Productos</Link> |
-            <Link to="/customers" className="hover:underline">Clientes</Link> 
+            <Link to="/customers" className="hover:underline">Clientes</Link> |
+            <Link to="/users" className="hover:underline">Usuarios</Link> 
         </nav>
       </header>
       <main className="flex-grow container mx-auto p-6">
