@@ -42,3 +42,12 @@ export const loginSchema = userZodSchema.pick({
   email: true,
   password: true,
 });
+export const changePasswordSchema = z.object({
+  newPassword: z
+    .string({ required_error: 'La contraseña actual obligatoria' })
+    .min(6, 'La contraseña actual debe tener al menos 6 caracteres'),
+  currentPassword: z
+    .string({ required_error: 'La nueva contraseña es obligatoria' })
+    .min(6, 'La nueva contraseña debe tener al menos 6 caracteres'),
+
+});

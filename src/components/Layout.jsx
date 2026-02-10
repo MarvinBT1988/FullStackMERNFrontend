@@ -11,6 +11,7 @@ const Layout = () => {
   }, [location]);
   const links = [
     { to: "/products", label: "Productos", roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
+    { to: "/users/changepassword", label: "Cambiar password", roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
     { to: "/customers", label: "Clientes", roles: ['ADMIN_ROLE', 'SALES_ROLE'] },
     { to: "/users", label: "Usuarios", roles: ['ADMIN_ROLE'] },
   ];

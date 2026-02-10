@@ -9,6 +9,7 @@ import UsersPage from './pages/users/UsersPage'
 import CreateUserPage from './pages/users/CreateUserPage'
 import EditUserPage from './pages/users/EditUserPage'
 import LoginUserPage from './pages/users/LoginUserPage'
+import ChangePasswordUserPage from './pages/users/ChangePasswordUserPage'
 import './App.css'
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import Layout from './components/Layout';
@@ -23,12 +24,12 @@ function App() {
           <Route path="/" element={<Layout />}>
             {/* --- RUTAS PÚBLICAS --- */}
             <Route index element={<Home />} />
-            <Route path="/users/login" element={<LoginUserPage />} />
-
+            <Route path="/users/login" element={<LoginUserPage />} />            
             {/* --- RUTAS: PRODUCTOS (Admin, Inventory, Sales) --- */}
             {/* --- PRODUCTOS: Acceso general para ver la lista --- */}
             <Route element={<ProtectedRoute allowedRoles={['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE']} />}>
               <Route path="/products" element={<ProductsPage />} />
+               <Route path="/users/changepassword" element={<ChangePasswordUserPage />} />
             </Route>
 
             {/* --- PRODUCTOS: Solo creación y edición (SALES queda fuera) --- */}

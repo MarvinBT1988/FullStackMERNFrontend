@@ -124,7 +124,7 @@ const CreateUserPage = () => {
                         <option value="inactive">Inactivo</option>
                     </select>
                 </div>
-                <button type="submit">Crear Cliente</button>
+                <button type="submit">Crear Usuario</button>
                 <button type="button" onClick={() => navigate('/users')}>Cancelar</button>
             </form>
             <ErrorMessage errors={errors} />
