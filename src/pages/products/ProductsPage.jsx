@@ -1,9 +1,9 @@
 import { getProducts, deleteProduct } from '../../services/productService';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { getAuthUser } from '../../utils/auth';
 const ProductsPage = () => {
-    console.log("funciono");
+    const user = getAuthUser();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
@@ -11,7 +11,7 @@ const ProductsPage = () => {
         nombre: ''
     });
     const navigate = useNavigate();
-   const fetchProducts = async () => {
+    const fetchProducts = async () => {
         try {
             setLoading(true);
             const response = await getProducts(formData);
@@ -35,7 +35,7 @@ const ProductsPage = () => {
         }
     };
 
-   useEffect(() => {
+    useEffect(() => {
         fetchProducts();
     }, []);
 
@@ -44,13 +44,13 @@ const ProductsPage = () => {
     }
     return (
         <div>
-           <form>
+            <form>
                 <div>
                     <label>Código:</label>
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         value={formData.codigo}
-                        onChange={(e) => setFormData({...formData, codigo: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
                     />
                 </div>
                 <div>
@@ -58,12 +58,17 @@ const ProductsPage = () => {
                     <input
                         type="text"
                         value={formData.nombre}
-                        onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                         required
                     />
                 </div>
-               <button onClick={fetchProducts}>Buscar</button>
-              <button onClick={() => navigate('/products/create')}>Agregar Producto</button><br />
+                <button onClick={fetchProducts}>Buscar</button>
+
+                {(user?.rol === 'ADMIN_ROLE' || user?.rol === 'INVENTORY_ROLE') && (
+                    <>
+                        <button onClick={() => navigate('/products/create')}>Agregar Producto</button><br />
+                    </>
+                )}
             </form>
             <h1>Lista de Productos</h1>
             <table>
@@ -73,7 +78,9 @@ const ProductsPage = () => {
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Marca</th>
-                        <th>Acciones</th>
+                        {(user?.rol === 'ADMIN_ROLE' || user?.rol === 'INVENTORY_ROLE') && (
+                            <th>Acciones</th>
+                        )}
                     </tr>
                 </thead>
                 <tbody>
@@ -84,18 +91,23 @@ const ProductsPage = () => {
                             <td>{product.descripcion || ''}</td>
                             <td>{product.marca || ''}</td>
                             <td>
-                                <button
-                                    className="btn-edit"
-                                    onClick={() => navigate(`/products/edit/${product._id}`)}
-                                >
-                                    Editar
-                                </button>
-                                <button
-                                    className="btn-delete"
-                                    onClick={() => handleDelete(product._id)}
-                                >
-                                    Eliminar
-                                </button>
+                                {(user?.rol === 'ADMIN_ROLE' || user?.rol === 'INVENTORY_ROLE') && (
+                                    <>
+                                        <button
+                                            className="btn-edit"
+                                            onClick={() => navigate(`/products/edit/${product._id}`)}
+                                        >
+                                            Editar
+                                        </button>
+
+                                        <button
+                                            className="btn-delete"
+                                            onClick={() => handleDelete(product._id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </>
+                                )}
                             </td>
                         </tr>
                     ))}

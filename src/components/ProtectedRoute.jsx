@@ -5,12 +5,10 @@ const ProtectedRoute = ({ allowedRoles }) => {
     const user = getAuthUser();
     const auth = isAuthenticated();
     if (!auth) {
-        return <Navigate to="/login" replace />;
-    }
-
-    // 2. ¿Tiene el rol necesario? (Si se especificaron roles)
+        return <Navigate to="/users/login" replace />;
+    }  
     if (allowedRoles && !allowedRoles.includes(user?.rol)) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/users/login" replace />;
     }
     return <Outlet />;
 };

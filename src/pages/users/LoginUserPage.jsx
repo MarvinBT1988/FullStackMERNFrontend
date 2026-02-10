@@ -38,7 +38,8 @@ const LoginPage = () => {
             else {
                 const response = await loginUser(credentials);
                 localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', response.data.user);
+                const userInfo=JSON.stringify(response.data.user);
+                localStorage.setItem('user',userInfo);
                 navigate('/');
             }
 
