@@ -8,10 +8,12 @@ import EditCustomerPage from './pages/customers/EditCustomerPage'
 import UsersPage from './pages/users/UsersPage'
 import CreateUserPage from './pages/users/CreateUserPage'
 import EditUserPage from './pages/users/EditUserPage'
+import LoginUserPage from './pages/users/LoginUserPage'
 import './App.css'
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from  './pages/Home'
+import ProtectedRoute from './components/ProtectedRoute';
 function App() {
 
   return (
@@ -29,6 +31,7 @@ function App() {
             <Route path="/users" element={<UsersPage />} />     
             <Route path="/users/create" element={<CreateUserPage />} />
             <Route path="/users/edit/:id" element={<EditUserPage />} /> 
+            <Route path="/users/login" element={<LoginUserPage />} /> 
           </Route>
         </Routes>
       </BrowserRouter>

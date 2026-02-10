@@ -37,3 +37,8 @@ export const userZodSchema = z.object({
     })
     .default('active'),
 });
+
+export const loginSchema = userZodSchema.pick({
+  email: true,
+  password: true,
+});
