@@ -1,23 +1,39 @@
+import React from 'react';
+import { Alert, AlertTitle, List, ListItem, ListItemText, Typography } from '@mui/material';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+
 const ErrorMessage = ({ errors }) => {
   if (!errors || errors.length === 0) return null;
 
   return (
-    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 shadow-sm animate-in fade-in duration-300">
-      <div className="flex items-center mb-2">
-       
-        <h3 className="text-red-800 font-bold uppercase text-sm tracking-wide">
-          Errores de validación
-        </h3>
-      </div>
+    <Alert 
+      severity="error" 
+      variant="filled" // Puedes usar "outlined" o dejarlo por defecto (standard)
+      icon={<ErrorOutlineIcon fontSize="inherit" />}
+      sx={{ mb: 3, width: '100%' }}
+    >
+      <AlertTitle sx={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.875rem' }}>
+        Errores de validación
+      </AlertTitle>
       
-      <ul className="list-disc ml-7 space-y-1">
+      <List sx={{ p: 0, listStyleType: 'disc', pl: 2 }}>
         {errors.map((error, index) => (
-          <li key={index} className="text-red-700 text-sm">
-            <span className="font-semibold capitalize">{error.campo}:</span> {error.mensaje}
-          </li>
+          <ListItem 
+            key={index} 
+            disablePadding 
+            sx={{ display: 'list-item', mb: 0.5 }}
+          >
+            <ListItemText
+              primary={
+                <Typography variant="body2">
+                  <strong>{error.campo}:</strong> {error.mensaje}
+                </Typography>
+              }
+            />
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Alert>
   );
 };
 
