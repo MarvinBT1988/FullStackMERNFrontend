@@ -1,9 +1,14 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { getAuthUser, isAuthenticated } from '../utils/auth';
-import { Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 const Layout = () => {
-  const user = getAuthUser();
-  const auth = isAuthenticated();
+  const [user, setUser] = useState(getAuthUser());
+  const [auth, setAuth] = useState(isAuthenticated());
+  const location = useLocation();
+  useEffect(() => {
+    setUser(getAuthUser());
+    setAuth(isAuthenticated());
+  }, [location]);
   const links = [
     { to: "/products", label: "Productos", roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
     { to: "/customers", label: "Clientes", roles: ['ADMIN_ROLE', 'SALES_ROLE'] },
@@ -16,7 +21,7 @@ const Layout = () => {
           <Link to="/" className="hover:underline">Home</Link>|
           {auth ? (
             <Link to="/users/login" className="hover:underline">
-               Cerrar sesión
+              Cerrar sesión
             </Link>
           ) : (
             <Link to="/users/login" className="hover:underline">
