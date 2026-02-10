@@ -6,8 +6,8 @@ import CustomersPage from './pages/customers/CustomersPage'
 import CreateCustomerPage from './pages/customers/CreateCustomerPage'
 import EditCustomerPage from './pages/customers/EditCustomerPage'
 import UsersPage from './pages/users/UsersPage'
-// import CreateCustomerPage from './pages/customers/CreateCustomerPage'
-// import EditCustomerPage from './pages/customers/EditCustomerPage'
+import CreateUserPage from './pages/users/CreateUserPage'
+import EditUserPage from './pages/users/EditUserPage'
 import './App.css'
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import Layout from './components/Layout';
@@ -26,7 +26,9 @@ function App() {
             <Route path="/customers" element={<CustomersPage />} />  
             <Route path="/customers/create" element={<CreateCustomerPage />} />    
             <Route path="/customers/edit/:id" element={<EditCustomerPage />} /> 
-             <Route path="/users" element={<UsersPage />} />     
+            <Route path="/users" element={<UsersPage />} />     
+            <Route path="/users/create" element={<CreateUserPage />} />
+            <Route path="/users/edit/:id" element={<EditUserPage />} /> 
           </Route>
         </Routes>
       </BrowserRouter>

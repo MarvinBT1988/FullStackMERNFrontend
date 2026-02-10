@@ -1,6 +1,6 @@
-const { z } = require('zod');
+import { z } from 'zod';
 
-const userZodSchema = z.object({
+export const userZodSchema = z.object({
   nombre: z
     .string({ required_error: 'El nombre es obligatorio' })
     .min(1, 'El nombre no puede estar vacío'),
@@ -37,5 +37,3 @@ const userZodSchema = z.object({
     })
     .default('active'),
 });
-
-module.exports = { userZodSchema };
