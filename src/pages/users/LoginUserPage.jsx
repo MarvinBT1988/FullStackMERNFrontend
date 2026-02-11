@@ -1,8 +1,21 @@
 import { useState, useEffect } from 'react';
-import { loginUser } from '../../services/userService';
-import ErrorMessage from '../../components/ErrorMessage';
-import { loginSchema } from '../../schemas/user';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Box, 
+  Button, 
+  TextField, 
+  Typography, 
+  Container, 
+  Paper, 
+  Avatar, 
+  CircularProgress 
+} from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'; // Necesitas instalar @mui/icons-material
+
+import { loginUser } from '../../services/userService';
+import { loginSchema } from '../../schemas/user';
+import ErrorMessage from '../../components/ErrorMessage';
+
 const LoginPage = () => {
     const navigate = useNavigate();
     const [credentials, setCredentials] = useState({
@@ -11,10 +24,12 @@ const LoginPage = () => {
     });
     const [errors, setErrors] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
     }, []);
+
     const handleChange = (e) => {
         setCredentials({
             ...credentials,
@@ -25,6 +40,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        setErrors([]);
 
         try {
             const resultado = loginSchema.safeParse(credentials);
@@ -34,71 +50,104 @@ const LoginPage = () => {
                     mensaje: issue.message
                 }));
                 setErrors(listaErrores);
-            }
-            else {
+            } else {
                 const response = await loginUser(credentials);
                 localStorage.setItem('token', response.data.token);
-                const userInfo=JSON.stringify(response.data.user);
-                localStorage.setItem('user',userInfo);
+                const userInfo = JSON.stringify(response.data.user);
+                localStorage.setItem('user', userInfo);
                 navigate('/');
             }
-
         } catch (error) {
-            let serverMessage = "";
-            if (error.response) {
-                serverMessage = error.response.data.msg || 'Error en el servidor';
-            } else if (error.request) {
-                serverMessage = 'No se pudo conectar con el servidor';
-            } else {
-                serverMessage = error.message;
-                console.error(serverMessage);
-            }
+            let serverMessage = error.response?.data?.msg || 'Error de conexión';
             setErrors([{ campo: 'SERVER', mensaje: serverMessage }]);
-
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     return (
-        <section>
-            <div>
-                <h2>Iniciar Sesión</h2>
-                <p>Introduce tus credenciales</p>
+        <Container component="main" maxWidth="xs">
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                <Paper 
+                    elevation={6} 
+                    sx={{ 
+                        p: 4, 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center',
+                        borderRadius: 3,
+                        width: '100%'
+                    }}
+                >
+                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                        <LockOutlinedIcon />
+                    </Avatar>
+                    
+                    <Typography component="h1" variant="h5" sx={{ mb: 1 }}>
+                        Iniciar Sesión
+                    </Typography>
+                    
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                        Introduce tus credenciales
+                    </Typography>
 
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label htmlFor="email">Email:</label>
-                        <input
+                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
                             id="email"
-                            type="email"
+                            label="Correo Electrónico"
                             name="email"
+                            autoComplete="email"
+                            autoFocus
                             value={credentials.email}
                             onChange={handleChange}
-                            placeholder="tu@correo.com"
-                            required
+                            disabled={isLoading}
                         />
-                    </div>
-
-                    <div>
-                        <label htmlFor="password">Contraseña:</label>
-                        <input
-                            id="password"
-                            type="password"
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
                             name="password"
+                            label="Contraseña"
+                            type="password"
+                            id="password"
+                            autoComplete="current-password"
                             value={credentials.password}
                             onChange={handleChange}
-                            placeholder="********"
-                            required
+                            disabled={isLoading}
                         />
-                    </div>
 
-                    <button type="submit" disabled={isLoading}>
-                        {isLoading ? 'Cargando...' : 'Entrar'}
-                    </button>
-                </form>
-                <ErrorMessage errors={errors} />
-            </div>
-        </section>
+                        {/* Tu componente de error se mantiene intacto */}
+                        <Box sx={{ mt: 2 }}>
+                            <ErrorMessage errors={errors} />
+                        </Box>
+
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            disabled={isLoading}
+                            sx={{ mt: 3, mb: 2, py: 1.2, fontWeight: 'bold' }}
+                        >
+                            {isLoading ? (
+                                <CircularProgress size={24} color="inherit" />
+                            ) : (
+                                'Entrar'
+                            )}
+                        </Button>
+                    </Box>
+                </Paper>
+            </Box>
+        </Container>
     );
 };
 
