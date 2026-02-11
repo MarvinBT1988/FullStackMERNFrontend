@@ -29,7 +29,6 @@ import {
 
 import { getAuthUser, isAuthenticated } from '../utils/auth';
 
-// Ancho fijo del menú lateral
 const drawerWidth = 240;
 
 const Layout = () => {
@@ -40,13 +39,11 @@ const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Sincronizar estado de usuario en cada cambio de ruta
   useEffect(() => {
     setUser(getAuthUser());
     setAuth(isAuthenticated());
   }, [location]);
 
-  // Cerrar menú móvil al navegar
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
@@ -56,21 +53,20 @@ const Layout = () => {
   };
 
   const handleLogout = () => {
-    // Aquí podrías agregar tu lógica de limpieza de localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/users/login');
   };
 
   const links = [
-    { to: "/", label: "Home", icon: <HomeIcon />, roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
+    // Se añade 'public: true' para que Home siempre aparezca
+    { to: "/", label: "Home", icon: <HomeIcon />, public: true }, 
     { to: "/products", label: "Productos", icon: <Inventory />, roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
     { to: "/customers", label: "Clientes", icon: <People />, roles: ['ADMIN_ROLE', 'SALES_ROLE'] },
     { to: "/users", label: "Usuarios", icon: <Badge />, roles: ['ADMIN_ROLE'] },
     { to: "/users/changepassword", label: "Seguridad", icon: <LockReset />, roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
   ];
 
-  // Estructura del menú lateral
   const drawerContent = (
     <Box sx={{ bgcolor: 'background.paper', height: '100%' }}>
       <Toolbar>
@@ -81,7 +77,7 @@ const Layout = () => {
       <Divider />
       <List sx={{ px: 1 }}>
         {links
-          .filter(link => link.roles.includes(user?.rol))
+          .filter(link => link.public || (user?.rol && link.roles?.includes(user.rol)))
           .map((link) => (
             <ListItem key={link.to} disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton 
@@ -113,7 +109,6 @@ const Layout = () => {
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f4f6f8' }}>
       <CssBaseline />
       
-      {/* BARRA SUPERIOR (NAVBAR) */}
       <AppBar 
         position="fixed" 
         sx={{ 
@@ -121,7 +116,8 @@ const Layout = () => {
           boxShadow: 'none',
           borderBottom: '1px solid rgba(0,0,0,0.12)',
           bgcolor: 'white',
-          color: 'text.primary'
+          color: 'text.primary',
+          width: '100%'
         }}
       >
         <Toolbar>
@@ -156,12 +152,10 @@ const Layout = () => {
         </Toolbar>
       </AppBar>
 
-      {/* NAVEGACIÓN LATERAL (DRAWER) */}
       <Box 
         component="nav" 
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
       >
-        {/* Móvil */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -175,7 +169,6 @@ const Layout = () => {
           {drawerContent}
         </Drawer>
 
-        {/* Escritorio */}
         <Drawer
           variant="permanent"
           sx={{
@@ -192,34 +185,41 @@ const Layout = () => {
         </Drawer>
       </Box>
 
-      {/* ÁREA DE CONTENIDO PRINCIPAL (100% RESPONSIVO) */}
       <Box 
         component="main" 
         sx={{ 
           flexGrow: 1, 
-          p: { xs: 2, sm: 3 }, 
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          maxWidth: '100%',
+          width: { xs: '100%', sm: `calc(100% - ${drawerWidth}px)` },
+          minHeight: '100vh',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          overflowX: 'hidden'
         }}
       >
-        <Toolbar /> {/* Espaciador para que el contenido no quede bajo el AppBar */}
+        <Toolbar /> 
         
-        {/* Contenedor Blanco del Outlet */}
         <Box sx={{ 
           flexGrow: 1,
-          bgcolor: 'white', 
           p: { xs: 2, sm: 3 }, 
-          borderRadius: 2,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          width: '100%',
-          overflow: 'auto' // Permite scroll interno si la tabla es grande
+          display: 'flex',
+          flexDirection: 'column'
         }}>
-          <Outlet />
+          <Box sx={{ 
+            flexGrow: 1,
+            bgcolor: 'white', 
+            p: { xs: 2, sm: 3 }, 
+            borderRadius: 2,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            width: '100%',
+            mx: 'auto',
+            display: 'flex', // Añadido para ayudar al centrado del hijo
+            flexDirection: 'column'
+          }}>
+            <Outlet />
+          </Box>
         </Box>
 
-        <Box component="footer" sx={{ py: 2, textAlign: 'center' }}>
+        <Box component="footer" sx={{ py: 2, textAlign: 'center', bgcolor: '#f4f6f8' }}>
           <Typography variant="caption" color="text.disabled">
             © 2026 Sistema de Gestión de Ventas - Panel Administrativo
           </Typography>

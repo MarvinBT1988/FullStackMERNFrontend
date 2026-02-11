@@ -5,150 +5,157 @@ import {
   Button, 
   TextField, 
   Typography, 
-  Container, 
   Paper, 
   Avatar, 
   CircularProgress 
 } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'; // Necesitas instalar @mui/icons-material
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import { loginUser } from '../../services/userService';
 import { loginSchema } from '../../schemas/user';
 import ErrorMessage from '../../components/ErrorMessage';
 
 const LoginPage = () => {
-    const navigate = useNavigate();
-    const [credentials, setCredentials] = useState({
-        email: '',
-        password: ''
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }, []);
+
+  const handleChange = (e) => {
+    setCredentials({
+      ...credentials,
+      [e.target.name]: e.target.value
     });
-    const [errors, setErrors] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+  };
 
-    useEffect(() => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-    }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrors([]);
 
-    const handleChange = (e) => {
-        setCredentials({
-            ...credentials,
-            [e.target.name]: e.target.value
-        });
-    };
+    try {
+      const resultado = loginSchema.safeParse(credentials);
+      if (!resultado.success) {
+        const listaErrores = resultado.error.issues.map(issue => ({
+          campo: issue.path[0],
+          mensaje: issue.message
+        }));
+        setErrors(listaErrores);
+      } else {
+        const response = await loginUser(credentials);
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        navigate('/');
+      }
+    } catch (error) {
+      let serverMessage = error.response?.data?.msg || 'Error de conexión';
+      setErrors([{ campo: 'SERVER', mensaje: serverMessage }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setErrors([]);
+  return (
+    /* ESTE BOX ES LA CLAVE: 
+       Ocupa el alto del contenedor blanco del Layout y centra el contenido 
+    */
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - 200px)', // Ajuste para quedar al centro visual
+        width: '100%',
+      }}
+    >
+      <Paper 
+        elevation={0} // Ponemos 0 porque el Layout ya tiene sombra y fondo blanco
+        sx={{ 
+          p: { xs: 2, sm: 4 }, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          width: '100%',
+          maxWidth: '400px', // Evita que se estire demasiado
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: 'primary.main', width: 56, height: 56 }}>
+          <LockOutlinedIcon fontSize="large" />
+        </Avatar>
+        
+        <Typography component="h1" variant="h4" sx={{ fontWeight: 'bold', mt: 1 }}>
+          Bienvenido
+        </Typography>
+        
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+          Ingresa tus credenciales para acceder
+        </Typography>
 
-        try {
-            const resultado = loginSchema.safeParse(credentials);
-            if (!resultado.success) {
-                const listaErrores = resultado.error.issues.map(issue => ({
-                    campo: issue.path[0],
-                    mensaje: issue.message
-                }));
-                setErrors(listaErrores);
-            } else {
-                const response = await loginUser(credentials);
-                localStorage.setItem('token', response.data.token);
-                const userInfo = JSON.stringify(response.data.user);
-                localStorage.setItem('user', userInfo);
-                navigate('/');
-            }
-        } catch (error) {
-            let serverMessage = error.response?.data?.msg || 'Error de conexión';
-            setErrors([{ campo: 'SERVER', mensaje: serverMessage }]);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Correo Electrónico"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={credentials.email}
+            onChange={handleChange}
+            disabled={isLoading}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Contraseña"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={credentials.password}
+            onChange={handleChange}
+            disabled={isLoading}
+          />
 
-    return (
-        <Container component="main" maxWidth="xs">
-            <Box
-                sx={{
-                    marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
-            >
-                <Paper 
-                    elevation={6} 
-                    sx={{ 
-                        p: 4, 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        alignItems: 'center',
-                        borderRadius: 3,
-                        width: '100%'
-                    }}
-                >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    
-                    <Typography component="h1" variant="h5" sx={{ mb: 1 }}>
-                        Iniciar Sesión
-                    </Typography>
-                    
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                        Introduce tus credenciales
-                    </Typography>
+          <Box sx={{ mt: 2 }}>
+            <ErrorMessage errors={errors} />
+          </Box>
 
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Correo Electrónico"
-                            name="email"
-                            autoComplete="email"
-                            autoFocus
-                            value={credentials.email}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Contraseña"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                            value={credentials.password}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                        />
-
-                        {/* Tu componente de error se mantiene intacto */}
-                        <Box sx={{ mt: 2 }}>
-                            <ErrorMessage errors={errors} />
-                        </Box>
-
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            disabled={isLoading}
-                            sx={{ mt: 3, mb: 2, py: 1.2, fontWeight: 'bold' }}
-                        >
-                            {isLoading ? (
-                                <CircularProgress size={24} color="inherit" />
-                            ) : (
-                                'Entrar'
-                            )}
-                        </Button>
-                    </Box>
-                </Paper>
-            </Box>
-        </Container>
-    );
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={isLoading}
+            sx={{ 
+              mt: 4, 
+              mb: 2, 
+              py: 1.5, 
+              fontWeight: 'bold',
+              fontSize: '1rem',
+              textTransform: 'none' 
+            }}
+          >
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              'Iniciar Sesión'
+            )}
+          </Button>
+        </Box>
+      </Paper>
+    </Box>
+  );
 };
 
 export default LoginPage;
