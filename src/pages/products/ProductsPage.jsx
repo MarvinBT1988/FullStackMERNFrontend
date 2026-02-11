@@ -5,7 +5,7 @@ import {
     TableCell, TableContainer, TableHead, TableRow, Paper, 
     IconButton, Box, CircularProgress, Grid,
     Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-    Snackbar, Alert
+    Snackbar, Alert, Stack
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 
@@ -16,16 +16,11 @@ const ProductsPage = () => {
     const user = getAuthUser();
     const navigate = useNavigate();
     
-    // Estados de datos
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({ codigo: '', nombre: '' });
-
-    // Estados para el Dialog (Confirmación de borrado)
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState(null);
-
-    // Estados para el Snackbar (Notificaciones)
     const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
 
     const hasPermission = user?.rol === 'ADMIN_ROLE' || user?.rol === 'INVENTORY_ROLE';
@@ -42,14 +37,12 @@ const ProductsPage = () => {
         }
     };
 
-    // Funciones de notificación
     const showNotification = (message, severity = 'success') => {
         setNotification({ open: true, message, severity });
     };
 
     const handleCloseSnackbar = () => setNotification({ ...notification, open: false });
 
-    // Manejo de eliminación con Dialog
     const handleOpenDeleteDialog = (id) => {
         setSelectedProductId(id);
         setOpenDialog(true);
@@ -73,12 +66,11 @@ const ProductsPage = () => {
     }, []);
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
                 Gestión de Productos
             </Typography>
 
-            {/* Panel de Filtros */}
             <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} sm={4}>
@@ -125,16 +117,20 @@ const ProductsPage = () => {
                 </Grid>
             </Paper>
 
-            {/* Tabla */}
-            <TableContainer component={Paper} elevation={2}>
-                <Table>
+            {/* TABLA CON SCROLL HORIZONTAL HABILITADO */}
+            <TableContainer component={Paper} elevation={2} sx={{ width: '100%', overflowX: 'auto' }}>
+                <Table sx={{ minWidth: 800 }}> {/* Forzamos ancho mínimo para activar scroll */}
                     <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                         <TableRow>
-                            <TableCell>Código</TableCell>
-                            <TableCell>Nombre</TableCell>
-                            <TableCell>Descripción</TableCell>
-                            <TableCell>Marca</TableCell>
-                            {hasPermission && <TableCell align="center">Acciones</TableCell>}
+                            <TableCell sx={{ fontWeight: 'bold' }}>Código</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Nombre</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Descripción</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Marca</TableCell>
+                            {hasPermission && (
+                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>
+                                    Acciones
+                                </TableCell>
+                            )}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -148,17 +144,28 @@ const ProductsPage = () => {
                             products.map((product) => (
                                 <TableRow key={product._id} hover>
                                     <TableCell><strong>{product.codigo}</strong></TableCell>
-                                    <TableCell>{product.nombre}</TableCell>
-                                    <TableCell>{product.descripcion || '-'}</TableCell>
+                                    <TableCell sx={{ minWidth: 150 }}>{product.nombre}</TableCell>
+                                    <TableCell sx={{ minWidth: 200 }}>{product.descripcion || '-'}</TableCell>
                                     <TableCell>{product.marca || '-'}</TableCell>
                                     {hasPermission && (
                                         <TableCell align="center">
-                                            <IconButton color="primary" onClick={() => navigate(`/products/edit/${product._id}`)}>
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton color="error" onClick={() => handleOpenDeleteDialog(product._id)}>
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
+                                            {/* Stack evita que los botones salten de línea */}
+                                            <Stack direction="row" spacing={1} justifyContent="center" sx={{ whiteSpace: 'nowrap' }}>
+                                                <IconButton 
+                                                    color="primary" 
+                                                    size="small"
+                                                    onClick={() => navigate(`/products/edit/${product._id}`)}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                                <IconButton 
+                                                    color="error" 
+                                                    size="small"
+                                                    onClick={() => handleOpenDeleteDialog(product._id)}
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Stack>
                                         </TableCell>
                                     )}
                                 </TableRow>
@@ -173,7 +180,7 @@ const ProductsPage = () => {
                 <DialogTitle>¿Confirmar eliminación?</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Esta acción no se puede deshacer. El producto será borrado permanentemente de la base de datos.
+                        Esta acción no se puede deshacer. El producto será borrado permanentemente.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -184,7 +191,7 @@ const ProductsPage = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* SNACKBAR DE NOTIFICACIÓN */}
+            {/* NOTIFICACIONES */}
             <Snackbar 
                 open={notification.open} 
                 autoHideDuration={4000} 

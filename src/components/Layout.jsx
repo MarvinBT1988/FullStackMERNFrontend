@@ -1,32 +1,52 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Box, Drawer, AppBar, Toolbar, List, Typography, 
-  ListItem, ListItemButton, ListItemIcon, ListItemText, 
-  IconButton, Button, CssBaseline 
+  Box, 
+  Drawer, 
+  AppBar, 
+  Toolbar, 
+  List, 
+  Typography, 
+  ListItem, 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  IconButton, 
+  Button, 
+  CssBaseline,
+  Divider
 } from '@mui/material';
 import {
-  Inventory, People, Badge, LockReset, Home, 
-  Logout, Login, Menu as MenuIcon 
+  Inventory, 
+  People, 
+  Badge, 
+  LockReset, 
+  Home as HomeIcon, 
+  Logout, 
+  Login, 
+  Menu as MenuIcon 
 } from '@mui/icons-material';
 
 import { getAuthUser, isAuthenticated } from '../utils/auth';
 
+// Ancho fijo del menú lateral
 const drawerWidth = 240;
 
 const Layout = () => {
   const [user, setUser] = useState(getAuthUser());
   const [auth, setAuth] = useState(isAuthenticated());
-  const [mobileOpen, setMobileOpen] = useState(false); // Estado para el menú móvil
+  const [mobileOpen, setMobileOpen] = useState(false);
+  
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Sincronizar estado de usuario en cada cambio de ruta
   useEffect(() => {
     setUser(getAuthUser());
     setAuth(isAuthenticated());
   }, [location]);
 
-  // Cerrar el menú móvil automáticamente al cambiar de ruta
+  // Cerrar menú móvil al navegar
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
@@ -35,75 +55,118 @@ const Layout = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleLogout = () => {
+    // Aquí podrías agregar tu lógica de limpieza de localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/users/login');
+  };
+
   const links = [
-    { to: "/", label: "Home", icon: <Home />, roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
+    { to: "/", label: "Home", icon: <HomeIcon />, roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
     { to: "/products", label: "Productos", icon: <Inventory />, roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
     { to: "/customers", label: "Clientes", icon: <People />, roles: ['ADMIN_ROLE', 'SALES_ROLE'] },
     { to: "/users", label: "Usuarios", icon: <Badge />, roles: ['ADMIN_ROLE'] },
     { to: "/users/changepassword", label: "Seguridad", icon: <LockReset />, roles: ['ADMIN_ROLE', 'INVENTORY_ROLE', 'SALES_ROLE'] },
   ];
 
-  // Contenido del menú (extraído para reutilizarlo en móvil y escritorio)
+  // Estructura del menú lateral
   const drawerContent = (
-    <div>
-      <Toolbar />
-      <Box sx={{ overflow: 'auto', mt: 2 }}>
-        <List>
-          {links
-            .filter(link => link.roles.includes(user?.rol))
-            .map((link) => (
-              <ListItem key={link.to} disablePadding>
-                <ListItemButton 
-                  component={Link} 
-                  to={link.to}
-                  selected={location.pathname === link.to}
-                >
-                  <ListItemIcon sx={{ color: location.pathname === link.to ? 'primary.main' : 'inherit' }}>
-                    {link.icon}
-                  </ListItemIcon>
-                  <ListItemText primary={link.label} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-        </List>
-      </Box>
-    </div>
+    <Box sx={{ bgcolor: 'background.paper', height: '100%' }}>
+      <Toolbar>
+        <Typography variant="subtitle1" fontWeight="bold" color="primary">
+          MENÚ PRINCIPAL
+        </Typography>
+      </Toolbar>
+      <Divider />
+      <List sx={{ px: 1 }}>
+        {links
+          .filter(link => link.roles.includes(user?.rol))
+          .map((link) => (
+            <ListItem key={link.to} disablePadding sx={{ mb: 0.5 }}>
+              <ListItemButton 
+                component={Link} 
+                to={link.to}
+                selected={location.pathname === link.to}
+                sx={{
+                  borderRadius: 2,
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.light',
+                    color: 'primary.contrastText',
+                    '& .MuiListItemIcon-root': { color: 'primary.contrastText' },
+                    '&:hover': { bgcolor: 'primary.main' }
+                  }
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  {link.icon}
+                </ListItemIcon>
+                <ListItemText primary={link.label} primaryTypographyProps={{ fontWeight: 'medium' }} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+      </List>
+    </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f4f6f8' }}>
       <CssBaseline />
       
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      {/* BARRA SUPERIOR (NAVBAR) */}
+      <AppBar 
+        position="fixed" 
+        sx={{ 
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          boxShadow: 'none',
+          borderBottom: '1px solid rgba(0,0,0,0.12)',
+          bgcolor: 'white',
+          color: 'text.primary'
+        }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }} // Solo visible en móvil
+            sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
           
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Sales System
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+            Ventas <span style={{ color: '#1976d2' }}>App</span>
           </Typography>
           
-          <Button color="inherit" onClick={() => navigate('/users/login')} startIcon={auth ? <Logout /> : <Login />}>
+          {auth && (
+            <Typography variant="body2" sx={{ mr: 2, display: { xs: 'none', md: 'block' }, color: 'text.secondary' }}>
+              {user?.nombre} | <b>{user?.rol}</b>
+            </Typography>
+          )}
+
+          <Button 
+            variant="outlined" 
+            size="small"
+            color={auth ? "error" : "primary"}
+            onClick={auth ? handleLogout : () => navigate('/users/login')} 
+            startIcon={auth ? <Logout /> : <Login />}
+          >
             {auth ? "Salir" : "Entrar"}
           </Button>
         </Toolbar>
       </AppBar>
 
-      {/* Menú Lateral - Lógica Responsiva */}
-      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
-        {/* Versión MÓVIL (Temporal) */}
+      {/* NAVEGACIÓN LATERAL (DRAWER) */}
+      <Box 
+        component="nav" 
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+      >
+        {/* Móvil */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }} // Mejora el rendimiento en móvil
+          ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: 'block', sm: 'none' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
@@ -112,12 +175,16 @@ const Layout = () => {
           {drawerContent}
         </Drawer>
 
-        {/* Versión ESCRITORIO (Permanente) */}
+        {/* Escritorio */}
         <Drawer
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': { 
+              boxSizing: 'border-box', 
+              width: drawerWidth,
+              borderRight: '1px solid rgba(0,0,0,0.12)'
+            },
           }}
           open
         >
@@ -125,11 +192,37 @@ const Layout = () => {
         </Drawer>
       </Box>
 
-      {/* Contenido Principal */}
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
-        <Toolbar />
-        <Box sx={{ bgcolor: 'white', p: { xs: 2, sm: 4 }, borderRadius: 2, minHeight: '80vh' }}>
+      {/* ÁREA DE CONTENIDO PRINCIPAL (100% RESPONSIVO) */}
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          p: { xs: 2, sm: 3 }, 
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          maxWidth: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        <Toolbar /> {/* Espaciador para que el contenido no quede bajo el AppBar */}
+        
+        {/* Contenedor Blanco del Outlet */}
+        <Box sx={{ 
+          flexGrow: 1,
+          bgcolor: 'white', 
+          p: { xs: 2, sm: 3 }, 
+          borderRadius: 2,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          width: '100%',
+          overflow: 'auto' // Permite scroll interno si la tabla es grande
+        }}>
           <Outlet />
+        </Box>
+
+        <Box component="footer" sx={{ py: 2, textAlign: 'center' }}>
+          <Typography variant="caption" color="text.disabled">
+            © 2026 Sistema de Gestión de Ventas - Panel Administrativo
+          </Typography>
         </Box>
       </Box>
     </Box>
