@@ -51,3 +51,7 @@ export const changePasswordSchema = z.object({
     .min(6, 'La nueva contraseña debe tener al menos 6 caracteres'),
 
 });
+
+export const userWithoutPasswordSchema = userZodSchema.omit({ 
+  password: true 
+});
