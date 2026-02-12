@@ -26,7 +26,7 @@ const Home = () => {
           <WavingHandIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
           
           <Typography variant="h2" component="h1" fontWeight="800" gutterBottom color="primary">
-            ¡Hola de nuevo! MERN
+            ¡Hola de nuevo! CRUSO DE MERN
           </Typography>
           
           <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
